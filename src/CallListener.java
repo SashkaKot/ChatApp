@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -64,7 +65,4 @@ public class CallListener {
 		return "CallListener [localNick=" + localNick + ", localIp=" + localIp + ", sSocket=" + sSocket + "]";
 	}
 
-	public static void main(String[] args) {
-
-	}
 }
