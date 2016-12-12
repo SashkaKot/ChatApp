@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -10,7 +11,6 @@ public class Caller {
 	private String ip;
 	private SocketAddress remoteAddress;
 	private String remoteNick;
-	// private final static int REMOTE_PORT = 28411; nused
 
 	public static enum CallStatus {
 		BUSY, NO_SERVICE, NOT_ACCESSIBLE, OK, REJECTED
