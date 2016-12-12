@@ -1,8 +1,11 @@
 
+
 import java.sql.Connection;
 
 import java.sql.*;
 import java.util.*;
+
+import javax.swing.JOptionPane;
 
 public class ServerConnection {
 
@@ -32,8 +35,8 @@ public class ServerConnection {
 			con = DriverManager.getConnection(serverAddress, "guest", "guest");
 			st = con.createStatement();
 		} catch (SQLException e) {
-			// TODO throw real error
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Connection error!", "ChatAPP", JOptionPane.ERROR_MESSAGE);
+			System.exit(-1);
 		} // catch
 	}
 
@@ -217,27 +220,5 @@ public class ServerConnection {
 	private static String safe(String s) {
 		return s.replaceAll("['\";]", "").replaceAll("\\s", "");
 	}
-
-	public static void main(String[] args) {
-		String nick1 = "latin&Р С”Р С‘РЎР‚Р С‘Р В»Р В»Р С‘РЎвЂ Р В°";
-		String nick2 = "another";
-
-		ServerConnection c = new ServerConnection();
-		c.setServerAddress("jdbc:mysql://files.litvinov.in.ua/chatapp_server?characterEncoding=utf-8&useUnicode=true");
-		c.connect();
-		assert c.isConnected();
-		c.setLocalNick(nick1);
-		System.out.println("Before: " + c.isNickOnline(nick1));
-		c.goOnline();
-		System.out.println("After: " + c.isNickOnline(nick1));
-		c.goOffline();
-		System.out.println("After offline: " + c.isNickOnline(nick1));
-
-		System.out.println("Another nick: " + c.isNickOnline(nick2));
-		System.out.println("My ip: " + c.getIpForNick(nick1));
-		System.out.println("Other ip: " + c.getIpForNick(nick2));
-
-		System.out.println("My port: " + c.getPortForNick(nick1));
-		System.out.println("Other port: " + c.getPortForNick(nick2));
-	}// main
 }
+
