@@ -48,7 +48,7 @@ public class CallListener {
 	}
 
 	public boolean isBusy() {
-		return sSocket.isBound();
+		return isBusy;
 	}
 
 	// TODO: Some with it
