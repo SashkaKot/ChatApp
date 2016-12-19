@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.util.Observable;
 
@@ -50,11 +51,17 @@ public class CommandListenerThread extends Observable implements Runnable {
 					case REJECT:
 						disconnected = true;
 						break;
+						
+					case NULL:
+						disconnected = true;
+						connection.disconnect();
+						
 					default: {
 						connection.reject();
 						disconnected = true;
 						break;
-					}
+					}	
+				
 					}
 				this.setChanged();
 				this.notifyObservers();
