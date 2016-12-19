@@ -25,7 +25,7 @@ public class Connection {
 
 	public Connection(Socket s, String nickname) throws IOException, SocketException {
 		this.socket = s;
-		this.socket.setSoTimeout(30000);
+		this.socket.setSoTimeout(100000);
 		outStream = new PrintStream(s.getOutputStream(),true, ENCODING);
 		kek = s.getInputStream();
 		DataStream = new Scanner(kek);
@@ -44,7 +44,7 @@ public class Connection {
 	public void sendNickBusy(String nick) throws UnsupportedEncodingException, IOException {
 		outStream.println("ChatApp 2015 user " + nick + " busy");
 	}
-
+	
 	public void accept() throws IOException {
 		outStream.println("Accepted");
 	}
