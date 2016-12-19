@@ -83,6 +83,8 @@ public class Form<JForm> {
 	private ContactsView friends;
 	private LocalContactsView local;
 	private JList list, list1;
+	private JFrame f1 = new JFrame();
+	private Container cp1 = f1.getContentPane();
 
 	/**
 	 * Launch the application.
@@ -314,17 +316,27 @@ public class Form<JForm> {
 					caller = new Caller(login, remoteAddrField.getText());
 					try {
 						connection = caller.call();
+						
 						if (connection != null) {
+							String data = connection.receive().toString();
+							if (data.contains("busy")) {
+								connection.disconnect();
+								remoteAddrField.setText("");
+								remoteLogiField.setText("");
+								JOptionPane.showMessageDialog(null, "This user is busy!");
+							} else {
+							formWait(true,f1,cp1);
 							commandLT.setConnection(connection);
 							commandLT.start();
 							// ThreadOfCommand();
 							connection.sendNickHello(nickField.getText());
-							forConnect();
+							}
 						} else {
 							JOptionPane.showMessageDialog(null, "Couldn't connect this ip ");
 							remoteAddrField.setText("");
 							remoteLogiField.setText("");
 						}
+						
 					} catch (InterruptedException e1) {
 
 						e1.printStackTrace();
@@ -334,7 +346,8 @@ public class Form<JForm> {
 					} catch (IOException e1) {
 
 						e1.printStackTrace();
-					}
+					} 
+					
 
 				} else {
 					JOptionPane.showMessageDialog(null, "Please enter ip");
@@ -342,7 +355,8 @@ public class Form<JForm> {
 					remoteLogiField.setText("");
 				}
 			}
-		});
+		}
+			);
 		messageArea.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -503,18 +517,22 @@ public class Form<JForm> {
 							try {
 								if (reply == 0) {
 									b = true;
+									if (connection != null){
 									connection.accept();
 									remoteAddrField.setText(callLT.getRemoteAddress().toString());
 									remoteLogiField.setText(command.toString());
 									forConnect();
 									break;
+									}
 								} else {
-									forDisconnect();
-									b = true;
+									if (connection != null){
 									connection.reject();
 									commandLT.stop();
 									connection = null;
+									forDisconnect();
 									break;
+									}
+									b = true;
 								}
 
 							} catch (IOException e) {
@@ -561,6 +579,13 @@ public class Form<JForm> {
 					switch (lastCommand.type) {
 					case ACCEPT: {
 						model.addMessage(remoteLogiField.getText(), new Date(), "User was accepted");
+						formWait(false,f1,cp1);
+						try {
+							forConnect();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						textArea.update(model, new Object());						
 						break;
 					}
@@ -568,12 +593,14 @@ public class Form<JForm> {
 						model.addMessage(remoteLogiField.getText(), new Date(), "User was rejected");
 						textArea.update(model, new Object());
 						commandLT.stop();
+						formWait(false,f1,cp1);
 						forDisconnect();
 						break;
 					}
 					case DISCONNECT: {
 						model.addMessage(remoteLogiField.getText(), new Date(), "User was disconnected");
 						textArea.update(model, new Object());
+						formWait(false,f1,cp1);
 						commandLT.stop();
 						forDisconnect();
 						break;
@@ -588,6 +615,7 @@ public class Form<JForm> {
 	}
 
 	void forDisconnect() {
+		connection = null;
 		send.setEnabled(false);
 		remoteLogiField.setText("");
 		messageArea.setEnabled(false);
@@ -627,6 +655,7 @@ public class Form<JForm> {
 		yes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (connection != null){
 					connection.accept();
 					connection.sendNickHello(nickField.getText());
 					remoteAddrField.setText(callListener.getRemoteAddress().toString());
@@ -634,6 +663,7 @@ public class Form<JForm> {
 					forConnect();
 					f.setVisible(false);
 					f.dispose();
+					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -643,6 +673,7 @@ public class Form<JForm> {
 		});
 		no.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (connection != null){
 				try {
 					connection.reject();
 					forDisconnect();
@@ -652,6 +683,7 @@ public class Form<JForm> {
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+				}
 				}
 
 			}
@@ -698,9 +730,8 @@ public class Form<JForm> {
 		f.setContentPane(cp);
 	}
 
-	void formWait(boolean b) {
-		final JFrame f = new JFrame();
-		Container cp = f.getContentPane();
+
+	void formWait(boolean b, JFrame f, Container cp) {
 		f.setSize(400, 175);
 		f.setLocation(200, 200);
 		f.setTitle("         Установка исходящего соединения");
@@ -712,7 +743,7 @@ public class Form<JForm> {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (connection != null) {
-						connection.disconnect();
+						connection.reject();
 
 					}
 					f.dispose();
